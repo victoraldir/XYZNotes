@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">XYZ Notes</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_add_edit_task">AddEditTaskActivity</string>
+
+    <string name="annotations">Annotations</string>
+    <string name="add_note">Add note</string>
+    <string name="empty_note_message">You can not save empty notes</string>
+    <string name="notes_empty">Empty</string>
+
+    <string name="no_tasks_add">Add a TO-DO item +</string>
+
+</resources>
