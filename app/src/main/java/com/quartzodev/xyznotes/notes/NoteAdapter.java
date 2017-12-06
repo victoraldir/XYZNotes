@@ -1,13 +1,15 @@
 package com.quartzodev.xyznotes.notes;
 
-import android.databinding.DataBindingUtil;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
+import android.widget.TextView;
 
+import com.quartzodev.xyznotes.R;
+import com.quartzodev.xyznotes.SingleLiveEvent;
 import com.quartzodev.xyznotes.data.Note;
-import com.quartzodev.xyznotes.databinding.NoteItemBinding;
 
 import java.util.List;
 
@@ -15,16 +17,12 @@ import java.util.List;
  * Created by victoraldir on 04/12/2017.
  */
 
-public class NoteAdapter extends BaseAdapter {
-
-    private final NotesViewModel mNotesViewModel;
-
+public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.ViewHolder> {
 
     private List<Note> mNotes;
+    private NotesViewModel mNotesViewModel;
 
-    public NoteAdapter(List<Note> notes,
-                       NotesViewModel notesViewModel){
-
+    public NoteAdapter(List<Note> notes, NotesViewModel notesViewModel){
         mNotes = notes;
         mNotesViewModel = notesViewModel;
     }
@@ -39,49 +37,45 @@ public class NoteAdapter extends BaseAdapter {
     }
 
     @Override
-    public int getCount() {
-        return mNotes != null ? mNotes.size() : 0;
+    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.notes_item_grid, parent, false);
+        return new NoteAdapter.ViewHolder(view);
     }
 
     @Override
-    public Object getItem(int i) {
-        return mNotes.get(i);
-    }
+    public void onBindViewHolder(ViewHolder holder, int position) {
 
-    @Override
-    public long getItemId(int i) {
-        return i;
-    }
+        final Note note = mNotes.get(position);
 
-    @Override
-    public View getView(int i, View view, ViewGroup viewGroup) {
-
-        NoteItemBinding binding;
-
-        if (view == null) {
-            // Inflate
-            LayoutInflater inflater = LayoutInflater.from(viewGroup.getContext());
-
-            // Create the binding
-            binding = NoteItemBinding.inflate(inflater, viewGroup, false);
-        } else {
-            // Recycling view
-            binding = DataBindingUtil.getBinding(view);
-        }
-
-        NoteItemUserActionsListener userActionsListener = new NoteItemUserActionsListener() {
+        holder.mNoteItemPreview.setText(note.getContent());
+        holder.mNoteItemToolbar.setTitle("Title goes here");
+        holder.mNoteItemToolbar.setSubtitle("10/10/2017 12:00");
+        holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onNoteClicked(Note note) {
+            public void onClick(View view) {
                 mNotesViewModel.getOpenNoteEvent().setValue(note.getId());
             }
-        };
+        });
+    }
 
-        binding.setNote(mNotes.get(i));
+    @Override
+    public int getItemCount() {
+        return mNotes == null ? 0 : mNotes.size();
+    }
 
-        binding.setListener(userActionsListener);
 
-        binding.executePendingBindings();
+    public class ViewHolder extends RecyclerView.ViewHolder{
 
-        return binding.getRoot();
+        final TextView mNoteItemPreview;
+        final Toolbar mNoteItemToolbar;
+        final View mView;
+
+        public ViewHolder(View itemView) {
+            super(itemView);
+            mView = itemView;
+            mNoteItemPreview = itemView.findViewById(R.id.note_preview);
+            mNoteItemToolbar = itemView.findViewById(R.id.toolbar_note_preview);
+        }
     }
 }

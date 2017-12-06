@@ -2,6 +2,8 @@ package com.quartzodev.xyznotes.notes;
 
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
 import android.databinding.ObservableArrayList;
 import android.databinding.ObservableBoolean;
@@ -29,6 +31,30 @@ import java.util.List;
 
 public class NotesViewModel extends AndroidViewModel {
 
+    // These observable fields will update Views automatically
+    public final MutableLiveData<List<Note>> items = new MutableLiveData<>();
+
+    public final ObservableBoolean dataLoading = new ObservableBoolean(false);
+
+    public final ObservableField<String> currentFilteringLabel = new ObservableField<>();
+
+    public final ObservableField<String> noTasksLabel = new ObservableField<>();
+
+    public final ObservableField<Drawable> noTaskIconRes = new ObservableField<>();
+
+    public final ObservableBoolean empty = new ObservableBoolean(false);
+
+    public final ObservableBoolean tasksAddViewVisible = new ObservableBoolean();
+
+    private final SnackbarMessage mSnackbarText = new SnackbarMessage();
+
+    private final ObservableBoolean mIsDataLoadingError = new ObservableBoolean(false);
+
+    private final SingleLiveEvent<Long> mOpenNoteEvent = new SingleLiveEvent<>();
+
+    private final Context mContext; // To avoid leaks, this must be an Application Context.
+
+    private final SingleLiveEvent<Void> mNewTaskEvent = new SingleLiveEvent<>();
 
     private final NotesRepository mNotesRepository;
 
@@ -78,9 +104,11 @@ public class NotesViewModel extends AndroidViewModel {
 
                 mIsDataLoadingError.set(false);
 
-                items.clear();
-                items.addAll(notesToShow);
-                empty.set(items.isEmpty());
+                items.postValue(notesToShow);
+
+//                items.clear();
+//                items.addAll(notesToShow);
+//                empty.set(items.isEmpty());
 
             }
 
@@ -98,33 +126,6 @@ public class NotesViewModel extends AndroidViewModel {
         mNewNoteEvent.call();
     }
 
-
-    // These observable fields will update Views automatically
-    public final ObservableList<Note> items = new ObservableArrayList<>();
-
-    public final ObservableBoolean dataLoading = new ObservableBoolean(false);
-
-    public final ObservableField<String> currentFilteringLabel = new ObservableField<>();
-
-    public final ObservableField<String> noTasksLabel = new ObservableField<>();
-
-    public final ObservableField<Drawable> noTaskIconRes = new ObservableField<>();
-
-    public final ObservableBoolean empty = new ObservableBoolean(false);
-
-    public final ObservableBoolean tasksAddViewVisible = new ObservableBoolean();
-
-    private final SnackbarMessage mSnackbarText = new SnackbarMessage();
-
-    private final ObservableBoolean mIsDataLoadingError = new ObservableBoolean(false);
-
-    private final SingleLiveEvent<Long> mOpenNoteEvent = new SingleLiveEvent<>();
-
-    private final Context mContext; // To avoid leaks, this must be an Application Context.
-
-    private final SingleLiveEvent<Void> mNewTaskEvent = new SingleLiveEvent<>();
-
-
     public void start() {
         loadNotes(false);
     }
@@ -134,22 +135,8 @@ public class NotesViewModel extends AndroidViewModel {
     }
 
 
-    public void clearCompletedTasks() {
-    }
-
-    public void completeTask(Note note, boolean completed) {
-    }
-
-    SnackbarMessage getSnackbarMessage() {
-        return mSnackbarText;
-    }
-
     SingleLiveEvent<Long> getOpenNoteEvent() {
         return mOpenNoteEvent;
-    }
-
-    SingleLiveEvent<Void> getNewTaskEvent() {
-        return mNewTaskEvent;
     }
 
     private void showSnackbarMessage(Integer message) {
