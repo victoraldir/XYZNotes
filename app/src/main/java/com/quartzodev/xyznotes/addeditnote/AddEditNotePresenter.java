@@ -32,7 +32,7 @@ public class AddEditNotePresenter implements AddEditNoteContract.Presenter, Note
         mNoteId = noteId;
 
         mIsDataMissing = shouldLoadDataFromRepo;
-
+        //The thick goes here!
         mAddNoteView.setPresenter(this);
     }
 
